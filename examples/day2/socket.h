@@ -6,6 +6,7 @@
 #include <string>
 
 #include "utils.h"
+#include "InetAddress.h"
 
 class Socket
 {
@@ -13,22 +14,31 @@ private:
     int fd_;
 public:
     Socket();
+    Socket(int fd);
     ~Socket();
 
+    int fd() const {
+        return fd_;
+    }
+
 public: // 列出所有的步骤
-    bool bind(int port, const std::string& host = "127.0.0.1");
+    bool bind(const InetAddress&);
 
     bool listen(int n);
 
     // return: client_fd
-    int accept();
+    Socket accept(InetAddress& addr);
 
-    bool connect(int port, const std::string& host = "127.0.0.1");
+    bool connect(const InetAddress&);
 
     bool send(const std::string&);
 
     int recv(char*& buf, size_t len);
 
     void close();
+
+    int release();
+
+    void setnoneblocking();
 };
 
