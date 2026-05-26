@@ -10,10 +10,7 @@ Socket::Socket()
 
 Socket::~Socket()
 {
-    if (fd_ != -1) {
-        close(fd_);
-        fd_ = -1;
-    }
+    this->close();
 }
 
 
@@ -55,4 +52,11 @@ bool Socket::send(const std::string& msg) {
 
 int Socket::recv(char*& buf, size_t len) {
     return ::recv(fd_, buf, len, 0);
+}
+
+void Socket::close() {
+    if (fd_ != -1) {
+        ::close(fd_);
+        fd_ = -1;
+    }
 }

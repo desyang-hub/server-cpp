@@ -28,5 +28,7 @@ public: // 列出所有的步骤
     bool send(const std::string&);
 
     int recv(char*& buf, size_t len);
+
+    void close();
 };
 
