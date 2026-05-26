@@ -10,14 +10,14 @@ int main(int argc, char const *argv[])
 
     InetAddress addr(8080);
     
-    Socket sock_;
+    Socket sock;
 
     std::string msg = "hello";
 
-    if (sock_.connect(addr)) {
+    if (sock.connect(addr)) {
         LOG_INFO << "connect always established." << endl;
         while (true) {
-            if (!sock_.send(msg)) {
+            if (!sock.send(msg)) {
                 LOG_ERROR << "send message error" << endl;
                 break;
             }
@@ -27,10 +27,6 @@ int main(int argc, char const *argv[])
             sleep(1);
         }
     }
-
-    std::vector<int> a{1, 2, 3, 4};
-
-    std::vector<int> b(a.begin(), a.begin());
 
     return 0;
 }

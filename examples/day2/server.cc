@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
     // 忽略 SIGPIPE，让 send() 返回 -1 而不是 kill 进程
     signal(SIGPIPE, SIG_IGN);
 
-    printf("Server start, wait user connect");
+    printf("TcpServer start, wait user connect");
     // 1. create socket
     int sock_fd = socket(AF_INET, SOCK_STREAM, 0); // AF_INET => IPv4 SOCK_STREAM => 流式 0=> 自动推导TCP还是UDP
 
@@ -63,7 +63,7 @@ int main(int argc, char const *argv[])
     ERRIF(status == -1, "listen error", {close(sock_fd);});
 
 
-    printf("Server start, wait user connect \n");
+    printf("TcpServer start, wait user connect \n");
     while (true) {
         // accept
         // 为接收的连接，准备地址

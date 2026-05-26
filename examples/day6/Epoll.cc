@@ -14,15 +14,11 @@ Epoll::Epoll(int init_event_size) : epfd_(epoll_create1(0)), events_(init_event_
 Epoll::~Epoll()
 {
     this->close();
-}
 
-
-bool Epoll::listenfd(int fd, int event) {
-    Channel* channel = new Channel(this, fd);
-    channel->setEvents(event);
-    
-    channelMap_[fd] = channel;
-    return channel->update();
+    // 将所有的channel* delete
+    for (auto& p : channelMap_) {
+        delete p.second;
+    }
 }
 
 // std::vector<epoll_event> Epoll::poll(int timeout) {
@@ -55,8 +51,11 @@ std::vector<Channel*> Epoll::poll(int timeout) {
     return activeChannels;
 }
 
+// 对于一个已经断开连接的fd, 由于我们将其绑定到channelMap中，所有必须要对断开的资源进行释放，否则会造成内存泄漏
 bool Epoll::updateChannel(Channel* channel) {
     if (!channel) return true;
+
+    channelMap_[channel->fd()] = channel;
 
     epoll_event ev{};
     ev.data.ptr = channel;
@@ -68,6 +67,7 @@ bool Epoll::updateChannel(Channel* channel) {
     if (channel->isInEpoll()) {
         state = epoll_ctl(epfd_, EPOLL_CTL_MOD, channel->fd(), &ev);
     } else {
+        channel->setIsInEpoll(true);
         state = epoll_ctl(epfd_, EPOLL_CTL_ADD, channel->fd(), &ev);
     }
 
@@ -77,4 +77,12 @@ bool Epoll::updateChannel(Channel* channel) {
     }
 
     return state != -1;
+}
+
+void Epoll::removeChannel(Channel* ch) {
+    int fd = ch->fd();
+    epoll_ctl(epfd_, EPOLL_CTL_DEL, fd, nullptr);
+
+    delete channelMap_[fd];
+    channelMap_.erase(fd);
 }
