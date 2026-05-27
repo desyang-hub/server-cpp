@@ -10,7 +10,7 @@
 
 TcpServer::TcpServer(EventLoop* loop, const InetAddress& addr) : loop_(loop), acceptor_(loop_, &addr) {
     // 将socket建立出来，并绑定事件后通过loop注册到epoll
-    acceptor_.setNewConnectionCallBack(std::bind(&TcpServer::newConnectionCallBack, this, std::placeholders::_1));
+    acceptor_.setNewConnectionCallBack(std::bind(&TcpServer::newConnection, this, std::placeholders::_1));
 }
 
 void TcpServer::messageCallBack(Channel* ch) {
@@ -47,7 +47,7 @@ void TcpServer::messageCallBack(Channel* ch) {
     sock.release();
 }
 
-void TcpServer::newConnectionCallBack(int fd) {
+void TcpServer::newConnection(int fd) {
     Channel* ch = new Channel(loop_, fd);
     ch->enableReading();
     ch->setReadEventCallBack(std::bind(&TcpServer::messageCallBack, this, std::placeholders::_1));

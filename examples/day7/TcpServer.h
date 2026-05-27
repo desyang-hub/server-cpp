@@ -20,5 +20,5 @@ public:
 
     void messageCallBack(Channel* ch);
 
-    void newConnectionCallBack(int fd);
+    void newConnection(int fd);
 };
