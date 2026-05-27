@@ -8,7 +8,7 @@ class EventLoop;
 
 class Channel
 {
-    using ReadEventCallBack = std::function<void(Channel*)>;
+    using ReadEventCallBack = std::function<void()>;
 private:
     EventLoop* loop_;
     int fd_;
@@ -34,7 +34,7 @@ public:
 
 public:
     int fd() const {return fd_;}
-    void setEvents(uint32_t events) {events_ = events; update();}
+    void setEvents(uint32_t events) {events_ = events;}
     uint32_t events() const {return events_;}
     void setREvents(uint32_t revents) {revents_ = revents;}
     uint32_t revents() const {return revents_;}
