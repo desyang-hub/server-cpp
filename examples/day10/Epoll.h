@@ -4,8 +4,9 @@
 #include <vector>
 #include <unistd.h>
 #include <unordered_map>
-
-class Channel;
+#include <mutex>
+#include <memory>
+#include <Channel.h>
 
 namespace
 {
@@ -18,8 +19,7 @@ class Epoll
 private:
     int epfd_;
     std::vector<epoll_event> events_;
-
-    std::unordered_map<int, Channel*> channelMap_;
+    mutable std::mutex mutex_;
 
 public:
     Epoll(int init_event_size = DEFAULT_EPOLL_EVENTS);
@@ -35,8 +35,8 @@ public:
 
     std::vector<Channel*> poll(int timeout = -1);
 
-    bool updateChannel(Channel*);
+    bool updateChannel(Channel* ch);
 
-    void removeChannel(Channel*);
+    void removeChannel(ChannelPtr ch);
 };
 

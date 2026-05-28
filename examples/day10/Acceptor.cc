@@ -4,31 +4,28 @@
 #include "Channel.h"
 #include "logger.h"
 
-Acceptor::Acceptor(EventLoop* loop, const InetAddress* addr) : loop_(loop), addr_(addr), sock_(), newConnectionCallBack_(nullptr) {
+Acceptor::Acceptor(EventLoop* loop, const InetAddress* addr) : loop_(loop), addr_(addr), sock_(), newConnectionCallBack_(nullptr), ch_(nullptr) {
     sock_.bind(*addr);
-    sock_.listen(10);
+    sock_.listen();
 
     int fd = sock_.fd();
-    Channel* ch = new Channel(loop_, fd, true);
 
-    // ch->setEvents(EPOLLIN);
-    ch->enableReading();
-    ch->setReadEventCallBack(std::bind(&Acceptor::acceptConnection, this));
+    ch_ = std::make_shared<Channel>(loop_, fd, false);
+    ch_->setEvents(EPOLLIN);
+    // ch->enableReading();
+    ch_->setReadEventCallBack(std::bind(&Acceptor::acceptConnection, this));
+    ch_->update();
 }
 
 void Acceptor::acceptConnection() {
     InetAddress addr = InetAddress();
     
-    Socket sock = sock_.accept(addr);
-    sock.setnoneblocking();
-    int fd = sock.release();
+    int fd = sock_.accept(addr);
 
-    LOG_INFO << "user fd " << fd << " " << " ip addr: " << addr << endl;
-
-    Socket* sockPtr = new Socket(fd);
+    // LOG_INFO << "user fd " << fd << " " << " ip addr: " << addr << endl;
 
     if (newConnectionCallBack_)
-        newConnectionCallBack_(sockPtr);
+        newConnectionCallBack_(fd);
 }
 
 void Acceptor::setNewConnectionCallBack(NewConnectionCallBack cb) {

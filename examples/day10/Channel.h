@@ -2,32 +2,30 @@
 
 #include <stdint.h> 
 #include <functional>
+#include <memory>
+#include "utils.h"
 
 class EventLoop;
 
-
-class Channel
+class Channel : public std::enable_shared_from_this<Channel>
 {
     using ReadEventCallBack = std::function<void()>;
 private:
     EventLoop* loop_;
     int fd_;
-
-    bool is_server_;
+    
     uint32_t events_;    // 注册事件
     uint32_t revents_;   // 当前收到的事件
     bool is_inEpoll_;
+    bool usePool_;
 
     ReadEventCallBack readEventCallBack_;
 
-    bool isServer() const {
-        return is_server_;
-    }
-
 public:
-    Channel(EventLoop* loop, int fd, bool is_server = false) : loop_(loop), fd_(fd), 
-        events_(0), revents_(0), is_inEpoll_(false),
-        is_server_(is_server), readEventCallBack_(nullptr) {}
+    Channel(EventLoop* loop, int fd, bool usePool = true) : loop_(loop), fd_(fd), 
+        events_(0), revents_(0), is_inEpoll_(false), readEventCallBack_(nullptr), usePool_(usePool) {
+            errif(fd_ == -1, "Invaild fd");
+        }
     ~Channel() {
         this->close();
     }
@@ -52,3 +50,6 @@ public:
 
     void remove();
 };
+
+
+using ChannelPtr = std::shared_ptr<Channel>;

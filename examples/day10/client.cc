@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
             errif(bytes_read == -1, "recv error");
 
             if (bytes_read == 0) {
-                LOG_INFO << "connect always disconnect. " << endl;
+                // LOG_INFO << "connect always disconnect. " << endl;
                 break;
             }
 

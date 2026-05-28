@@ -4,38 +4,39 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <string>
+#include <memory>
 
 #include "utils.h"
 #include "socket.h"
+#include "Channel.h"
 
 class EventLoop;
 class Socket;
 
-class Connection
+class Connection : public std::enable_shared_from_this<Connection>
 {
-    using DeleteConnectionCallBack = std::function<void(Socket*)>;
+    using DeleteConnectionCallBack = std::function<void(int)>;
 private:
-    Socket* sock_;
+    Socket sock_;
     EventLoop* loop_;
+    ChannelPtr ch_;
     DeleteConnectionCallBack deleteConnectionCallBack_;
     std::string readBuffer_;
 
 
 public:
-    Connection(EventLoop* loop, Socket* sock);
+    Connection(EventLoop* loop, int fd);
     ~Connection() {
-        if (sock_) {
-            delete sock_;
-            sock_ = nullptr;
-        }
     }
 
 public:
     void deleteConnection() {
         if (deleteConnectionCallBack_) {
-            deleteConnectionCallBack_(sock_);
+            deleteConnectionCallBack_(sock_.fd());
         }
     }
+
+    void initReadEventCallBack();
 
     void echo();
 

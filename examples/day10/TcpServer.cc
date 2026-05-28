@@ -13,19 +13,25 @@ TcpServer::TcpServer(EventLoop* loop, const InetAddress& addr) : loop_(loop), ac
     acceptor_.setNewConnectionCallBack(std::bind(&TcpServer::newConnection, this, std::placeholders::_1));
 }
 
-void TcpServer::newConnection(Socket* sock) {
-    Connection* conn = new Connection(loop_, sock);
-    conn->setDeleteConnectionCallBack(std::bind(&TcpServer::deleteConnection, this, std::placeholders::_1));
-    connMap_[sock->fd()] = conn;
+void TcpServer::newConnection(int fd) {
+    if (fd != -1) {
+        ConnectionPtr connPtr = std::make_shared<Connection>(loop_, fd);
+        connPtr->initReadEventCallBack();
+        connPtr->setDeleteConnectionCallBack(std::bind(&TcpServer::deleteConnection, this, std::placeholders::_1));
+
+        
+        std::lock_guard<std::mutex> lock(mutex_);
+        errif(connMap_.count(fd), "conn exitst.");
+        connMap_[fd] = connPtr;
+    }
 }
 
-void TcpServer::deleteConnection(Socket* sock) {
-    int fd = sock->fd();
+// FIXME： 只要有任务运行就不能够删除
+void TcpServer::deleteConnection(int fd) {
+    std::lock_guard<std::mutex> lock(mutex_);
     // 将连接移除
     if (connMap_.count(fd) == 0) { // 不存在
         return;
     }
-
-    delete connMap_[fd];
     connMap_.erase(fd);
 }

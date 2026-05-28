@@ -24,14 +24,14 @@ public:
 public: // 列出所有的步骤
     int bind(const InetAddress&);
 
-    int listen(int n);
+    int listen(int n = SOMAXCONN);
 
     // return: client_fd
-    Socket accept(InetAddress& addr);
+    int accept(InetAddress& addr);
 
     bool connect(const InetAddress&);
 
-    bool send(const std::string&);
+    int send(std::string);
 
     int recv(char* buf, size_t len);
 
@@ -40,5 +40,7 @@ public: // 列出所有的步骤
     int release();
 
     void setnoneblocking();
+
+    void setTimeout(int seconds);
 };
 

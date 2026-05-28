@@ -18,6 +18,6 @@ void EventLoop::updateChannel(Channel* ch) {
     epoll_.updateChannel(ch);
 }
 
-void EventLoop::removeChannel(Channel* ch) {
+void EventLoop::removeChannel(ChannelPtr ch) {
     epoll_.removeChannel(ch);
 }

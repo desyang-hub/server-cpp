@@ -1,6 +1,8 @@
 #pragma once
 
 #include <unordered_map>
+#include <mutex>
+#include <memory>
 
 #include "socket.h"
 #include "Acceptor.h"
@@ -9,24 +11,22 @@
 class EventLoop;
 class Channel;
 
+using ConnectionPtr = std::shared_ptr<Connection>;
+
 class TcpServer
 {
 private:
     EventLoop* loop_;
     Acceptor acceptor_;
-    std::unordered_map<int, Connection*> connMap_;
+    std::unordered_map<int, ConnectionPtr> connMap_;
+
+    mutable std::mutex mutex_;
 public:
     TcpServer(EventLoop* loop, const InetAddress& addr);
-    ~TcpServer() {
-        // 将connMap_ 中的所有元素回收
-        for (auto& p : connMap_) {
-            delete p.second;
-            p.second = nullptr;
-        }
-    }
+    ~TcpServer() = default;
 
 public:
-    void newConnection(Socket* sock);
+    void newConnection(int fd);
 
-    void deleteConnection(Socket* sock);
+    void deleteConnection(int fd);
 };

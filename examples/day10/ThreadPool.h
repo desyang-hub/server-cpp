@@ -10,7 +10,9 @@
 #include <cstdint>
 #include <stdexcept>
 
-const int DEFAULT_POOL_SIZE = 4;
+#include "logger.h"
+
+const int DEFAULT_POOL_SIZE = 8;
 
 class ThreadPool
 {
@@ -18,7 +20,7 @@ class ThreadPool
 private:
     std::queue<WorkerHandler> queue_;
     std::vector<std::thread> workers_;
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
     std::condition_variable condition_;
 
     bool isStop_;

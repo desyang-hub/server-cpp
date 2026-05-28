@@ -12,16 +12,18 @@ class EventLoop
 private:
     Epoll epoll_;
     ThreadPool pool_;
+    
 public:
-     EventLoop() = default;
+    EventLoop() {
+    }
     ~EventLoop() = default;
 
 public:
     void loop();
 
-    void updateChannel(Channel*);
+    void updateChannel(Channel* ch);
 
-    void removeChannel(Channel*);
+    void removeChannel(ChannelPtr ch);
 
     template<class F, typename ...Args>
     std::future<typename std::result_of<F(Args...)>::type>
