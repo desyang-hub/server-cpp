@@ -8,17 +8,23 @@
 #include "Channel.h"
 #include "logger.h"
 
-TcpServer::TcpServer(EventLoop* loop, const InetAddress& addr) : loop_(loop), acceptor_(loop_, &addr) {
+TcpServer::TcpServer(EventLoop* loop, const InetAddress& addr) : mainReactor_(loop), acceptor_(loop, &addr), pool_(std::thread::hardware_concurrency()), subReactors_(std::thread::hardware_concurrency()) {
     // 将socket建立出来，并绑定事件后通过loop注册到epoll
     acceptor_.setNewConnectionCallBack(std::bind(&TcpServer::newConnection, this, std::placeholders::_1));
+
+    // 将所有的subReactor 事件循环loop() 用 ThreadPool 运行起来
+    for (int i = 0; i < std::thread::hardware_concurrency(); ++i) {
+        pool_.enqueue(&EventLoop::loop, &subReactors_[i]);
+    }
 }
 
 void TcpServer::newConnection(int fd) {
     if (fd != -1) {
-        ConnectionPtr connPtr = std::make_shared<Connection>(loop_, fd);
+        int id = fd % subReactors_.size();
+
+        ConnectionPtr connPtr = std::make_shared<Connection>(&subReactors_[id], fd);
         connPtr->initReadEventCallBack();
         connPtr->setDeleteConnectionCallBack(std::bind(&TcpServer::deleteConnection, this, std::placeholders::_1));
-
         
         std::lock_guard<std::mutex> lock(mutex_);
         errif(connMap_.count(fd), "conn exitst.");

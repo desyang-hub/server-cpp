@@ -12,13 +12,13 @@ void Channel::enableReading() {
 }
 
 void Channel::handelEvent() {
-    
     if (readEventCallBack_) {
-        if (usePool_) {
-            loop_->execute(readEventCallBack_);
-        }
-        else
-            readEventCallBack_();
+        readEventCallBack_();
+        // if (usePool_) {
+        //     loop_->execute(readEventCallBack_);
+        // }
+        // else
+        //     readEventCallBack_();
     }
 }
 

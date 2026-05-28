@@ -12,3 +12,18 @@ Failed Requests : 0
 QPS (Throughput): 311429.46 req/s
 Avg Latency     : 3.121 ms
 =========================================
+
+
+### 升级后
+
+./test_d11 -t 100 -m 10000
+========== Stress Test Start ==========
+Threads: 100 | Msgs/Thread: 10000 | Total Expected: 1000000
+
+========== Stress Test Report ==========
+Total Time      : 2.086 s
+Success Requests: 1000000 / 1000000 (100.00%)
+Failed Requests : 0
+QPS (Throughput): 479386.39 req/s
+Avg Latency     : 0.173 ms
+=========================================
