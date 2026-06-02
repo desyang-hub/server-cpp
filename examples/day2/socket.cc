@@ -2,9 +2,8 @@
 
 #include <unistd.h>
 
-Socket::Socket()
+Socket::Socket() : fd_(socket(AF_INET, SOCK_STREAM, 0))
 {
-    fd_ = socket(AF_INET, SOCK_STREAM, 0);
     assert(fd_ != -1);
 }
 
@@ -23,11 +22,11 @@ bool Socket::listen(int n) {
     return ::listen(fd_, n) != -1;
 }
 
-Socket Socket::accept(InetAddress& addr) {
+int Socket::accept(InetAddress& addr) {
     int client_fd = ::accept(fd_, (sockaddr*)&addr.addr_, &addr.addrlen_);
     assert(client_fd != -1);
 
-    return Socket(client_fd);
+    return client_fd;
 }
 
 bool Socket::connect(const InetAddress& addr) {
@@ -39,7 +38,7 @@ bool Socket::send(const std::string& msg) {
     return (::send(fd_, msg.c_str(), msg.size(), 0)) != -1;
 }
 
-int Socket::recv(char*& buf, size_t len) {
+int Socket::recv(char* buf, size_t len) {
     return ::recv(fd_, buf, len, 0);
 }
 
