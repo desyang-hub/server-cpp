@@ -18,16 +18,23 @@ int main(int argc, char const *argv[])
     bind(sock_fd, (sockaddr*)&server_addr, sizeof(server_addr));
 
     // 3. 监听请求
-    listen(sock_fd, 3);
+    listen(sock_fd, SOMAXCONN);
 
     // accept
 
     // 为接收的连接，准备地址
-    sockaddr_in client_addr{};
-    socklen_t sock_len = sizeof(client_addr);
-    int client_fd = accept(sock_fd, (sockaddr*)&client_addr, &sock_len);
 
-    // 连接成功打印地址
-    printf("client fd[%d] addr: %s:%d \n", client_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));\
+    std::cout << "waiting for client connection..." << std::endl;
+
+    while (true) {
+        sockaddr_in client_addr{};
+        socklen_t sock_len = sizeof(client_addr);
+        int client_fd = accept(sock_fd, (sockaddr*)&client_addr, &sock_len);
+    
+        // 连接成功打印地址
+        printf("client fd[%d] addr: %s:%d \n", client_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));\
+        
+    }
+    
     return 0;
 }

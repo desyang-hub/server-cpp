@@ -8,7 +8,7 @@
 #include "socket.h"
 #include "logger.h"
 
-Connection::Connection(EventLoop* loop, int fd) : loop_(loop), sock_(fd), ch_(std::make_shared<Channel>(loop_, fd)) {
+Connection::Connection(EventLoop* loop, int fd) : loop_(loop), sock_(fd), ch_(std::make_shared<Channel>(loop, fd)) {
     sock_.setnoneblocking();
     ch_->enableReading();
 }

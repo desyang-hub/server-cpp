@@ -12,9 +12,9 @@ int main(int argc, char const *argv[])
     server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     server_addr.sin_port = htons(8080);
 
-    connect(sock_fd, (sockaddr*)&server_addr, sizeof(server_addr));
-
-    printf("connected successfully.\n");
+    if (connect(sock_fd, (sockaddr*)&server_addr, sizeof(server_addr)) != -1) {
+        printf("connected successfully.\n");
+    }
 
     return 0;
 }
