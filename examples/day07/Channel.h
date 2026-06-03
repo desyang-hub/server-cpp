@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 class EventLoop;
 
@@ -45,3 +46,5 @@ public:
 
     void handleEvent();
 };
+
+using ChannelPtr = std::shared_ptr<Channel>;
