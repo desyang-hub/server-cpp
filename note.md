@@ -26,3 +26,12 @@ target_compile_options(server_d10 PRIVATE -fsanitize=address -fno-omit-frame-poi
 target_link_options(server_d10 PRIVATE -fsanitize=address)
 
 启用后，通过脚本重复测试，获取异常点，此处
+
+
+### mainReactor 陷阱
+TODO:  这正是 ET 模式 + listen fd 的经典陷阱！
+若使用 ET（Edge Triggered）模式：
+必须一次性 accept 所有连接，否则：
+如果只 accept 一次，而 backlog 中还有多个连接，
+后续 epoll_wait 不会再通知你（因为 ET 只在状态变化时触发一次），
+导致连接堆积甚至超时。

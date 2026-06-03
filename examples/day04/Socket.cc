@@ -37,7 +37,7 @@ void Socket::bind(const InetAddress& addr) {
     errif(::bind(fd_, (sockaddr*)&addr.addr_, addr.sock_len_) == -1, "bind error");
 }
 
-void Socket::listen(int n = SOMAXCONN) {
+void Socket::listen(int n) {
     errif(::listen(fd_, n) == -1, "listen error");
 }
 
