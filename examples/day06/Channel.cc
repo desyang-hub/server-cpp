@@ -1,8 +1,8 @@
 #include "Channel.h"
 
-#include "Epoll.h"
+#include "EventLoop.h"
 
-Channel::Channel(Epoll* epoll, int fd) : epoll_(epoll), fd_(fd), isInEpoll_(false), events_(0), revents_(0) {
+Channel::Channel(EventLoop* loop, int fd) : loop_(loop), fd_(fd), isInEpoll_(false), events_(0), revents_(0), eventCallBack_(nullptr) {
 
 }
 
@@ -31,7 +31,7 @@ void Channel::setRevents(int revents) {
 }
 
 void Channel::update() {
-    epoll_->updateChannel(this);
+    loop_->updateChannel(this);
 }
 
 void Channel::enableRead() {
@@ -51,5 +51,15 @@ void Channel::setInEpoll() {
 }
 
 void Channel::remove() {
-    epoll_->removeChannel(this);
+    loop_->removeChannel(this);
+}
+
+void Channel::setEventCallBack(const EventCallBack& cb) {
+    eventCallBack_ = cb; // 拷贝构造
+}
+
+void Channel::handleEvent() {
+    if (eventCallBack_) {
+        eventCallBack_(fd_);
+    }
 }

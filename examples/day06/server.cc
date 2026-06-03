@@ -3,6 +3,7 @@
 #include "Epoll.h"
 #include "Channel.h"
 #include "utils.h"
+#include "EventLoop.h"
 
 #include <iostream>
 #include <unistd.h>
@@ -70,14 +71,39 @@ int main(int argc, char const *argv[])
     sock.listen();
 
     // epoll create
-    Epoll epoll;
+    // Epoll epoll;
 
     // epoll.listen_fd(sock.fd(), EPOLLIN);
 
+    EventLoop loop;
+
     std::unordered_map<int, ChannelPtr> channels;
-    channels[sock.fd()] = std::move(std::make_unique<Channel>(&epoll, sock.fd()));
+    channels[sock.fd()] = std::move(std::make_unique<Channel>(&loop, sock.fd()));
     channels[sock.fd()]->enableRead();
     channels[sock.fd()]->update();
+    // connection callback
+    channels[sock.fd()]->setEventCallBack([&sock, &channels, &loop](int){
+        InetAddress cli_addr;
+        int fd = sock.accept(cli_addr);
+
+        Socket cli_sock(fd);
+        cli_sock.setnoneblocking();
+
+        fd = cli_sock.release();
+        
+        errif (channels.count(fd) != 0, "fd always exists.");
+        // epoll.listen_fd(cli_sock.release(), EPOLLIN | EPOLLET);
+        channels[fd] = std::move(std::make_unique<Channel>(&loop, fd));
+        channels[fd]->enableRead();
+        channels[fd]->enableET();
+        channels[fd]->update();
+        channels[fd]->setEventCallBack([&loop, &channels](int fd){
+            event_handler(fd, loop.epfd(), channels);
+        });
+    });
+
+    std::cout << "Epoll ET EventLoop server start, listen port: " << port << std::endl;
+    loop.loop();
 
 
     // TODO:  这正是 ET 模式 + listen fd 的经典陷阱！
@@ -88,34 +114,34 @@ int main(int argc, char const *argv[])
     // 导致连接堆积甚至超时。
 
     // loop accept
-    std::cout << "Epoll ET server start, listen port: " << port << std::endl;
-    while (true) {
-        std::vector<Channel*> activeChannels = epoll.poll(-1);
+    // std::cout << "Epoll ET server start, listen port: " << port << std::endl;
+    // while (true) {
+    //     std::vector<Channel*> activeChannels = epoll.poll(-1);
 
-        for (auto& ch : activeChannels) {
-            if (ch->fd() == sock.fd()) {
-                // mainReactor 使用的是LT触发，不必一次处理所有的accept
-                InetAddress cli_addr;
-                int fd = sock.accept(cli_addr);
+    //     for (auto& ch : activeChannels) {
+    //         if (ch->fd() == sock.fd()) {
+    //             // mainReactor 使用的是LT触发，不必一次处理所有的accept
+    //             InetAddress cli_addr;
+    //             int fd = sock.accept(cli_addr);
 
-                Socket cli_sock(fd);
-                cli_sock.setnoneblocking();
+    //             Socket cli_sock(fd);
+    //             cli_sock.setnoneblocking();
 
-                fd = cli_sock.release();
+    //             fd = cli_sock.release();
                 
-                errif (channels.count(fd) != 0, "fd always exists.");
-                // epoll.listen_fd(cli_sock.release(), EPOLLIN | EPOLLET);
-                channels[fd] = std::move(std::make_unique<Channel>(&epoll, fd));
-                channels[fd]->enableRead();
-                channels[fd]->enableET();
-                channels[fd]->update();
+    //             errif (channels.count(fd) != 0, "fd always exists.");
+    //             // epoll.listen_fd(cli_sock.release(), EPOLLIN | EPOLLET);
+    //             channels[fd] = std::move(std::make_unique<Channel>(&epoll, fd));
+    //             channels[fd]->enableRead();
+    //             channels[fd]->enableET();
+    //             channels[fd]->update();
 
-                std::cout << "user addr: " << cli_addr.toIpPort() << std::endl;
-            } else {
-                event_handler(ch->fd(), epoll.epfd(), channels);
-            }
-        }
-    }
+    //             std::cout << "user addr: " << cli_addr.toIpPort() << std::endl;
+    //         } else {
+    //             event_handler(ch->fd(), epoll.epfd(), channels);
+    //         }
+    //     }
+    // }
 
     return 0;
 }

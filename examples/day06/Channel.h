@@ -1,18 +1,22 @@
 #pragma once
 
-class Epoll;
+#include <functional>
+
+class EventLoop;
 
 class Channel
 {
+    using EventCallBack = std::function<void(int)>;
 private:
-    Epoll* epoll_;
+    EventLoop* loop_;
     int fd_;
     int events_;
     int revents_;
     bool isInEpoll_;
+    EventCallBack eventCallBack_;
 
 public:
-    Channel(Epoll* epoll, int fd);
+    Channel(EventLoop* loop, int fd);
     ~Channel();
 
     int fd() const;
@@ -36,4 +40,8 @@ public:
     void setInEpoll();
 
     void remove();
+
+    void setEventCallBack(const EventCallBack& cb);
+
+    void handleEvent();
 };

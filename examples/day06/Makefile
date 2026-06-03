@@ -4,7 +4,7 @@ client:
 	g++ -o client client.cc
 
 server:
-	g++ -o server server.cc Socket.cc Epoll.cc InetAddress.cc Channel.cc
+	g++ -o server server.cc Socket.cc Epoll.cc InetAddress.cc Channel.cc EventLoop.cc
 
 test:
 	g++ -o test test.cc
