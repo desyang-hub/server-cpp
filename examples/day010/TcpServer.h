@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <unordered_map>
+#include <mutex>
 
 class EventLoop;
 
@@ -20,6 +21,8 @@ private:
 
     NewConnectionCallBack newConnectionCallBack_;
     DisConnectionCallBack disConnectionCallBack_;
+
+    mutable std::mutex mutex_;
 public:
     TcpServer( EventLoop* loop, const InetAddress& addr);
     ~TcpServer() = default;
@@ -30,7 +33,7 @@ public:
 
     void setDisConnectionCallBack(const DisConnectionCallBack& cb);
 
-    void disConnectionCallBack(Socket*);
+    void disConnectionCallBack(int fd);
 
     void echo(int);
 };

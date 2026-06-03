@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-Channel::Channel(EventLoop* loop, int fd) : loop_(loop), fd_(fd), isInEpoll_(false), events_(0), revents_(0), eventCallBack_(nullptr) {
+Channel::Channel(EventLoop* loop, int fd, bool runInThreadPool_) : loop_(loop), fd_(fd), isInEpoll_(false), events_(0), revents_(0), eventCallBack_(nullptr), runInThreadPool_(runInThreadPool_) {
 
 }
 
@@ -33,7 +33,7 @@ void Channel::setRevents(int revents) {
 }
 
 void Channel::update() {
-    loop_->updateChannel(this);
+    loop_->updateChannel(shared_from_this());
 }
 
 void Channel::enableRead() {
@@ -53,7 +53,7 @@ void Channel::setInEpoll() {
 }
 
 void Channel::remove() {
-    loop_->removeChannel(this);
+    loop_->removeChannel(fd_);
 }
 
 void Channel::setEventCallBack(const EventCallBack& cb) {
@@ -62,6 +62,10 @@ void Channel::setEventCallBack(const EventCallBack& cb) {
 
 void Channel::handleEvent() {
     if (eventCallBack_) {
-        eventCallBack_();
+        if (runInThreadPool_) {
+            loop_->submit(eventCallBack_);
+        } else {
+            eventCallBack_();
+        }
     }
 }

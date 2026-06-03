@@ -5,16 +5,21 @@
 #include "utils.h"
 
 
-Connection::Connection(EventLoop* loop, int fd) : loop_(loop), ch_(nullptr), sock_(fd) {
+Connection::Connection(EventLoop* loop, int fd, bool runInThreadPool) : loop_(loop), ch_(nullptr), sock_(fd) {
     sock_.setnoneblocking();
 
-    ch_ = std::move(std::make_unique<Channel>(loop, sock_.fd()));
+    ch_ = std::move(std::make_unique<Channel>(loop, sock_.fd(), runInThreadPool));
     ch_->enableRead();
     ch_->enableET();
     ch_->update();
+}
 
-    // 多线程下，可能会有异常，因为ch被注册到epoll中，此时这里的this，可能已经被别的线程delete了，所以并发场景需要通过shared_ptr来解决这个问题，确保保留一份实例
-    ch_->setEventCallBack(std::bind(&Connection::echo, this));
+void Connection::initReadEventCallBack() {
+    // 通过shared_ptr来管理生命周期
+    auto self = shared_from_this();
+    ch_->setEventCallBack([self]{
+        self->echo();
+    });
 }
 
 void Connection::setDeleteConnectionCallBack(const DeleteConnectionCallBack& cb) {
@@ -50,10 +55,9 @@ void Connection::echo() {
     }
 
     if (need_close) {
-        errif (!deleteConnectionCallBack_, "deleteConnectionCallBack_ is unset");
-        
+        std::cout << "need close" << std::endl;
         if (deleteConnectionCallBack_)
-            deleteConnectionCallBack_(&sock_);
+            deleteConnectionCallBack_(sock_.fd());
         else
             std::cout << "error call back" << std::endl;
     }

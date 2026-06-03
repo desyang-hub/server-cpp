@@ -18,18 +18,21 @@ void TcpServer::newConnectionCallBack(Socket* sock) {
     InetAddress addr;
     int fd = sock->accept(addr);
 
-    std::cout << "connection user=" << fd << std::endl;
+    std::lock_guard<std::mutex> lock(mutex_);
 
+    errif(connections_.count(fd) != 0, "connection always exists.");
     // 单线程暂时无需考虑数据竞争问题
-    connections_[fd] = std::make_shared<Connection>(loop_, fd);
+    connections_[fd] = std::make_shared<Connection>(loop_, fd, true);
+    connections_[fd]->initReadEventCallBack();
 
     connections_[fd]->setDeleteConnectionCallBack(std::bind(&TcpServer::disConnectionCallBack, this, std::placeholders::_1));
 }
 
-void TcpServer::disConnectionCallBack(Socket* sock) {
-    std::cout << "user fd=" << sock->fd() << " disconnected." << std::endl;
+void TcpServer::disConnectionCallBack(int fd) {
+    std::cout << "user fd=" << fd << " disconnected." << std::endl;
+    std::lock_guard<std::mutex> lock(mutex_);
     // 数据保护
-    if (connections_.count(sock->fd())) {
-        connections_.erase(sock->fd());
+    if (connections_.count(fd)) {
+        connections_.erase(fd);
     }
 }

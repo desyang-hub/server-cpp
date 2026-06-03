@@ -6,12 +6,13 @@
 #include "nonecopyable.h"
 
 #include <functional>
+#include <memory>
 
 class EventLoop;
 
-class Connection : public nonecopyable
+class Connection : public std::enable_shared_from_this<Connection>
 {
-    using DeleteConnectionCallBack = std::function<void(Socket*)>;
+    using DeleteConnectionCallBack = std::function<void(int)>;
 private:
     EventLoop* loop_;
     ChannelPtr ch_;
@@ -20,11 +21,10 @@ private:
     DeleteConnectionCallBack deleteConnectionCallBack_;
 
 public:
-    Connection(EventLoop* loop, int);
+    Connection(EventLoop* loop, int fd, bool runInThreadPool = false);
     ~Connection() = default;
 
-    Connection(Connection&&) noexcept = default;
-    Connection& operator=(Connection&&) noexcept = default;
+    void initReadEventCallBack();
 
     void setDeleteConnectionCallBack(const DeleteConnectionCallBack&);
 

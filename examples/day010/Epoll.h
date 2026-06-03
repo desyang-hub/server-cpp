@@ -4,8 +4,7 @@
 #include <sys/epoll.h>
 
 #include "nonecopyable.h"
-
-class Channel;
+#include "Channel.h"
 
 const int EPOLL_EVENT_MAX_SIZE = 1024;
 
@@ -21,9 +20,9 @@ public:
 
     int epfd() const;
 
-    void updateChannel(Channel*);
+    void updateChannel(ChannelPtr);
 
-    void removeChannel(Channel*);
+    void removeChannel(int fd);
 
     void listen_fd(int fd, int ev_option);
 
