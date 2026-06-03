@@ -15,7 +15,7 @@ Socket::~Socket()
 }
 
 bool Socket::bind(const InetAddress& addr) {
-    return ::bind(fd_, (sockaddr*)&addr.addr_, addr.addrlen_) != -1;
+    return ::bind(fd_, (sockaddr*)&addr.addr_, addr.addr_len_) != -1;
 }
 
 bool Socket::listen(int n) {
@@ -23,14 +23,14 @@ bool Socket::listen(int n) {
 }
 
 int Socket::accept(InetAddress& addr) {
-    int client_fd = ::accept(fd_, (sockaddr*)&addr.addr_, &addr.addrlen_);
+    int client_fd = ::accept(fd_, (sockaddr*)&addr.addr_, &addr.addr_len_);
     assert(client_fd != -1);
 
     return client_fd;
 }
 
 bool Socket::connect(const InetAddress& addr) {
-    return ::connect(fd_, (sockaddr*)&addr.addr_, addr.addrlen_) != -1;
+    return ::connect(fd_, (sockaddr*)&addr.addr_, addr.addr_len_) != -1;
 }
 
 

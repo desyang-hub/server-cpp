@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <fcntl.h>
+#include <cassert>
 
 using Seconds = std::chrono::seconds;
 
@@ -33,3 +34,5 @@ inline void setnoneblocking(int fd) {
 
     fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
+
+#define Assert(expr) assert(expr)

@@ -1,0 +1,16 @@
+all: client server test epoll_usage
+
+client:
+	g++ -o client client.cc
+
+server:
+	g++ -o server server.cc
+
+test:
+	g++ -o test test.cc
+
+epoll_usage:
+	g++ -o epoll_usage epoll_usage.cc
+
+clean:
+	rm -rf client server test epoll_usage

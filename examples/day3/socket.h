@@ -14,7 +14,7 @@ private:
     int fd_;
 public:
     Socket();
-    Socket(int fd);
+    explicit Socket(int fd);
     ~Socket();
 
     int fd() const {
@@ -24,7 +24,7 @@ public:
 public: // 列出所有的步骤
     bool bind(const InetAddress&);
 
-    bool listen(int n);
+    bool listen(int n = SOMAXCONN);
 
     // return: client_fd
     Socket accept(InetAddress& addr);

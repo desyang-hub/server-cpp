@@ -8,9 +8,9 @@
 struct InetAddress
 {
     sockaddr_in addr_;
-    socklen_t addrlen_;
+    socklen_t addr_len_;
 public:
-    explicit InetAddress(int port, const std::string& host = "127.0.0.1") : addrlen_(sizeof(addr_))
+    explicit InetAddress(int port, const std::string& host = "127.0.0.1") : addr_len_(sizeof(addr_))
     {
         bzero(&addr_, sizeof(addr_));
         addr_.sin_family = AF_INET;
@@ -18,7 +18,7 @@ public:
         addr_.sin_port = htons(port);
     }
 
-    InetAddress() : addr_(sockaddr_in{}), addrlen_(sizeof(addr_)) {}
+    InetAddress() : addr_(sockaddr_in{}), addr_len_(sizeof(addr_)) {}
 
     ~InetAddress() = default;
 
