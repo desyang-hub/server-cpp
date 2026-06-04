@@ -36,13 +36,13 @@ std::string Buffer::retrieveAsString(size_t len) {
 }
 
 void Buffer::retrieveAll() {
-    readerIndex_ = writerIndex_;
+    readerIndex_ = 0;
+    writerIndex_ = 0;
 }
 
 std::string Buffer::retrieveAllAsString() {
     std::string bytes = retrieveAsString(readableBytes());
-    readerIndex_ = 0;
-    writerIndex_ = 0;
+    retrieveAll();
     return bytes;
 }
 
@@ -53,7 +53,7 @@ void Buffer::append(const std::string& msg) {
     // 1. 剩余空间足够写入
     if (writableBytes() >= msg.size()) {
         copyToBack(msg);
-    } else if(writableBytes() + prependableBytes() <= msg.size()) { // 2. 空间足够，需要前移prepareable
+    } else if(writableBytes() + prependableBytes() >= msg.size()) { // 2. 空间足够，需要前移prepareable
         copyToFront();
         copyToBack(msg);
     } else { // 3. 空间不足，前移后，先扩容继续将后半部分数据写入
@@ -70,7 +70,7 @@ void Buffer::append(const char* buf, size_t len) {
     // 1. 剩余空间足够写入
     if (writableBytes() >= len) {
         copyToBack(buf, len);
-    } else if(writableBytes() + prependableBytes() <= len) { // 2. 空间足够，需要前移prepareable
+    } else if(writableBytes() + prependableBytes() >= len) { // 2. 空间足够，需要前移prepareable
         copyToFront();
         copyToBack(buf, len);
     } else { // 3. 空间不足，前移后，先扩容继续将后半部分数据写入
@@ -86,7 +86,7 @@ size_t Buffer::readableBytes() const {
 }
 
 size_t Buffer::writableBytes() const {
-    return store_.size() - readableBytes();
+    return store_.size() - writerIndex_;
 }
 
 size_t Buffer::prependableBytes() const {

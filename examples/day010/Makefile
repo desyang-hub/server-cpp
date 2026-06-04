@@ -1,4 +1,4 @@
-all: client server test epoll_usage
+all: client server test epoll_usage buffer_test
 
 client:
 	g++ -o client client.cc
@@ -9,8 +9,11 @@ server:
 test:
 	g++ -o test test.cc
 
+buffer_test:
+	g++ -o Buffer-test Buffer-test.cc Buffer.cc
+
 epoll_usage:
 	g++ -o epoll_usage epoll_usage.cc
 
 clean:
-	rm -rf client server test epoll_usage
+	rm -rf client server test epoll_usage Buffer-test

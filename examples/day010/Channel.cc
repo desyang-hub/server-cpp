@@ -33,7 +33,7 @@ void Channel::setRevents(int revents) {
 }
 
 void Channel::update() {
-    loop_->updateChannel(shared_from_this());
+    loop_->updateChannel(this);
 }
 
 void Channel::enableRead() {

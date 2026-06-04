@@ -5,7 +5,7 @@
 
 class EventLoop;
 
-class Channel : public std::enable_shared_from_this<Channel>
+class Channel
 {
     using EventCallBack = std::function<void()>;
 private:
@@ -48,4 +48,4 @@ public:
     void handleEvent();
 };
 
-using ChannelPtr = std::shared_ptr<Channel>;
+using ChannelPtr = std::unique_ptr<Channel>;

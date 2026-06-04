@@ -15,3 +15,9 @@
 * 发生死锁了，似乎线程池中的任务一直没有结束 ?? 忘记设置connection回调函数了
 
 Connection 和 Channel都用shared_ptr来管理
+
+出问题了，似乎所有的fd都没有被关闭，需要调试Connection的生命周期，其对Socket进行管理
+
+内存泄露了，所有的Connection建立后似乎都没有析构
+
+#### 找到问题了，使用shared_ptr过程中，发生了循环引用的问题，导致成员变量持有自己的shared_ptr引用，所以资源永远无法释放，这个场景就可以用到weak_ptr智能指针，其并不持有shared_ptr资源，而是在需要时，尝试获取

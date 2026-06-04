@@ -5,20 +5,24 @@
 #include "utils.h"
 
 
-Connection::Connection(EventLoop* loop, int fd, bool runInThreadPool) : loop_(loop), ch_(nullptr), sock_(fd) {
+Connection::Connection(EventLoop* loop, int fd, bool runInThreadPool) : loop_(loop), sock_(fd), ch_(loop, sock_.fd(), runInThreadPool), readBuffer_(), deleteConnectionCallBack_(nullptr) {
     sock_.setnoneblocking();
 
-    ch_ = std::move(std::make_unique<Channel>(loop, sock_.fd(), runInThreadPool));
-    ch_->enableRead();
-    ch_->enableET();
-    ch_->update();
+    // ch_ = std::move(std::make_unique<Channel>(loop, sock_.fd(), runInThreadPool));
+    ch_.enableRead();
+    ch_.enableET();
+    ch_.update();
 }
 
 void Connection::initReadEventCallBack() {
     // 通过shared_ptr来管理生命周期
-    auto self = shared_from_this();
-    ch_->setEventCallBack([self]{
-        self->echo();
+    // auto self = 
+    // auto self =  shared_from_this(); 原先用，导致所有对象不析构
+    std::weak_ptr<Connection> wk_self = shared_from_this();
+    ch_.setEventCallBack([wk_self]{
+        auto self = wk_self.lock();
+        if (self)
+            self->echo();
     });
 }
 
@@ -55,7 +59,6 @@ void Connection::echo() {
     }
 
     if (need_close) {
-        std::cout << "need close" << std::endl;
         if (deleteConnectionCallBack_)
             deleteConnectionCallBack_(sock_.fd());
         else

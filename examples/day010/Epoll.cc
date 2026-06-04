@@ -17,9 +17,9 @@ int Epoll::epfd() const {
     return epfd_;
 }
 
-void Epoll::updateChannel(ChannelPtr ch) {
+void Epoll::updateChannel(Channel* ch) {
     epoll_event ev{};
-    ev.data.ptr = ch.get();
+    ev.data.ptr = ch;
     ev.events = ch->events();
 
     // channel alwas register to epoll, just mod

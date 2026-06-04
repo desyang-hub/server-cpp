@@ -15,8 +15,6 @@ private:
     bool isStop_;
     
     ThreadPool pool_;
-
-    std::unordered_map<int, ChannelPtr> channels_;
 public:
     EventLoop();
     ~EventLoop() = default;
@@ -25,7 +23,7 @@ public:
 
     void loop();
 
-    void updateChannel(ChannelPtr);
+    void updateChannel(Channel*);
 
     void removeChannel(int fd);
 

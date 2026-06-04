@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <memory>
+#include <iostream>
 
 class EventLoop;
 
@@ -15,8 +16,8 @@ class Connection : public std::enable_shared_from_this<Connection>
     using DeleteConnectionCallBack = std::function<void(int)>;
 private:
     EventLoop* loop_;
-    ChannelPtr ch_;
     Socket sock_;
+    Channel ch_;
     Buffer readBuffer_;
     DeleteConnectionCallBack deleteConnectionCallBack_;
 

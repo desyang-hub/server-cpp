@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <string>
 #include <memory>
+#include <iostream>
 
 #include "utils.h"
 #include "socket.h"
@@ -27,6 +28,7 @@ private:
 public:
     Connection(EventLoop* loop, int fd);
     ~Connection() {
+        std::cout << "~Connection" << std::endl;
     }
 
 public:

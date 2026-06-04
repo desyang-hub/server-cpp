@@ -4,11 +4,11 @@
 
 #include <iostream>
 
-Acceptor::Acceptor(EventLoop* loop, const InetAddress& addr) : loop_(loop), newConnectionCallBack_(nullptr), sock_(), chPtr_(nullptr) {
+Acceptor::Acceptor(EventLoop* loop, const InetAddress& addr) : sock_(), loop_(loop), chPtr_(std::make_unique<Channel>(loop, sock_.fd())), newConnectionCallBack_(nullptr) {
     sock_.bind(addr);
     sock_.listen();
 
-    chPtr_ = std::make_unique<Channel>(loop, sock_.fd());
+    // chPtr_ = ;
     chPtr_->enableRead();
     chPtr_->update();
 
