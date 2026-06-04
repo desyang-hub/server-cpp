@@ -2,13 +2,19 @@
 
 #include "Acceptor.h"
 #include "Connection.h"
-
+#include "ThreadPool.h"
 
 #include <functional>
 #include <unordered_map>
 #include <mutex>
+#include <vector>
+#include <thread>
 
 class EventLoop;
+
+namespace {
+    const int HARDWARE_CONCURRENCY = std::thread::hardware_concurrency();
+}
 
 class TcpServer
 {
@@ -16,8 +22,11 @@ class TcpServer
     using DisConnectionCallBack = std::function<void(Socket*)>;
 private:
     Acceptor acceptor_;
-    EventLoop* loop_;
+    EventLoop* mainReactor_;
+    ThreadPool threadPool_;
+    std::vector<EventLoop> subReactors_;
     std::unordered_map<int, ConnectionPtr> connections_;
+    
 
     NewConnectionCallBack newConnectionCallBack_;
     DisConnectionCallBack disConnectionCallBack_;

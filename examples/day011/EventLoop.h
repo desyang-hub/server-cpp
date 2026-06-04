@@ -14,7 +14,7 @@ private:
     Epoll epoll_;
     bool isStop_;
     
-    ThreadPool pool_;
+    // ThreadPool pool_;
 public:
     EventLoop();
     ~EventLoop() = default;
@@ -27,11 +27,11 @@ public:
 
     void removeChannel(int fd);
 
-    template<class F>
-    void submit(F&& f);
+    // template<class F>
+    // void submit(F&& f);
 };
 
-template<class F>
-inline void EventLoop::submit(F&& f) {
-    pool_.enqueue(std::forward<F>(f));
-}
+// template<class F>
+// inline void EventLoop::submit(F&& f) {
+//     pool_.enqueue(std::forward<F>(f));
+// }

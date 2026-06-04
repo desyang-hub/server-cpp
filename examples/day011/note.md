@@ -24,3 +24,17 @@ Connection 和 Channel都用shared_ptr来管理
 
 
 ### day011 需要添加主从多Reactor模式
+
+wsl 下测试结果，性能优异 cpu core x 6
+
+(base) root@DESKTOP-U42DJ8K:/home/desyang/github/server-cpp/build/examples/day11# ./test_d11 -t 1000 -m 100
+========== Stress Test Start ==========
+Threads: 1000 | Msgs/Thread: 100 | Total Expected: 100000
+
+========== Stress Test Report ==========
+Total Time      : 0.347 s
+Success Requests: 100000 / 100000 (100.00%)
+Failed Requests : 0
+QPS (Throughput): 288184.44 req/s
+Avg Latency     : 1.630 ms
+=========================================
