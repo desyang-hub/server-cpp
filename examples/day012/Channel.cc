@@ -62,10 +62,6 @@ void Channel::setEventCallBack(const EventCallBack& cb) {
 
 void Channel::handleEvent() {
     if (eventCallBack_) {
-        if (runInThreadPool_) {
-            // loop_->submit(eventCallBack_);
-        } else {
-            eventCallBack_();
-        }
+        loop_->submit(eventCallBack_);
     }
 }

@@ -2,10 +2,17 @@
 
 #include "InetAddress.h"
 
+class Buffer;
+
+namespace {
+    const size_t SOCKET_DEFAULT_BUFFER_SIZE = 1024;
+}
+
 class Socket
 {
 private:
     int fd_;
+    bool isNoneBlocking_;
 public:
     Socket();
     explicit Socket(int fd);
@@ -46,4 +53,6 @@ public:
     void setTimeout(int seconds);
 
     void setInetAddrReuse();
+
+    bool isNoneBlocking() const;
 };

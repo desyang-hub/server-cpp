@@ -28,13 +28,21 @@ void TcpServer::newConnectionCallBack(Socket* sock) {
     // 更具fd随机分配到subReactor
     int id = fd % subReactors_.size();
 
-    std::lock_guard<std::mutex> lock(mutex_);
-    errif(connections_.count(fd) != 0, "connection always exists.");
+    ConnectionPtr connPtr = std::make_shared<Connection>(&subReactors_[id], fd);
+    connPtr->initReadEventCallBack();
+    connPtr->setDeleteConnectionCallBack(std::bind(&TcpServer::disConnectionCallBack, this, std::placeholders::_1));
+    connPtr->setOnMessageCallBack(onMessageCallBack_);
 
-    connections_[fd] = std::make_shared<Connection>(&subReactors_[id], fd);
-    connections_[fd]->initReadEventCallBack();
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        errif(connections_.count(fd) != 0, "connection always exists.");
+        connections_[fd] = connPtr;
+    }
 
-    connections_[fd]->setDeleteConnectionCallBack(std::bind(&TcpServer::disConnectionCallBack, this, std::placeholders::_1));
+    // 考虑一下这里是否会有并发问题
+    if (onConnectionCallBack_) {
+        onConnectionCallBack_(connPtr.get());
+    }
 }
 
 void TcpServer::disConnectionCallBack(int fd) {
@@ -44,4 +52,12 @@ void TcpServer::disConnectionCallBack(int fd) {
     if (connections_.count(fd)) {
         connections_.erase(fd);
     }
+}
+
+void TcpServer::setOnConnection(const OnConnectionCallBack& onConnection) {
+    onConnectionCallBack_ = onConnection;
+}
+
+void TcpServer::setOnMessageCallBack(const OnMessageCallBack& cb) {
+    onMessageCallBack_ = cb;
 }

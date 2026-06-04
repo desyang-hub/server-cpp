@@ -11,6 +11,7 @@
 #include <thread>
 
 class EventLoop;
+class Buffer;
 
 namespace {
     const int HARDWARE_CONCURRENCY = std::thread::hardware_concurrency();
@@ -20,6 +21,8 @@ class TcpServer
 {
     using NewConnectionCallBack = std::function<void(Socket*)>;
     using DisConnectionCallBack = std::function<void(Socket*)>;
+    using OnConnectionCallBack = std::function<void(Connection*)>;
+    using OnMessageCallBack = std::function<void(Connection*, Buffer*)>;
 private:
     Acceptor acceptor_;
     EventLoop* mainReactor_;
@@ -28,8 +31,10 @@ private:
     std::unordered_map<int, ConnectionPtr> connections_;
     
 
-    NewConnectionCallBack newConnectionCallBack_;
-    DisConnectionCallBack disConnectionCallBack_;
+    NewConnectionCallBack   newConnectionCallBack_;
+    DisConnectionCallBack   disConnectionCallBack_;
+    OnConnectionCallBack    onConnectionCallBack_;
+    OnMessageCallBack       onMessageCallBack_;
 
     mutable std::mutex mutex_;
 public:
@@ -44,5 +49,7 @@ public:
 
     void disConnectionCallBack(int fd);
 
-    void echo(int);
+    void setOnConnection(const OnConnectionCallBack& onConnection);
+
+    void setOnMessageCallBack(const OnMessageCallBack&);
 };

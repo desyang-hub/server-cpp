@@ -7,16 +7,17 @@
 #include "ThreadPool.h"
 
 #include <unordered_map>
+#include <stdint.h>
 
 class EventLoop : public nonecopyable
 {
 private:
     Epoll epoll_;
     bool isStop_;
-    
-    // ThreadPool pool_;
+    size_t threadPoolSize_;
+
 public:
-    EventLoop();
+    explicit EventLoop(size_t threadPoolSize_ = 0);
     ~EventLoop() = default;
 
     int epfd() const;
@@ -27,11 +28,19 @@ public:
 
     void removeChannel(int fd);
 
-    // template<class F>
-    // void submit(F&& f);
+    /// @brief 提交到EventLoop执行任务
+    /// @tparam F 
+    /// @param f
+    template<class F>
+    void submit(F&& f);
 };
 
-// template<class F>
-// inline void EventLoop::submit(F&& f) {
-//     pool_.enqueue(std::forward<F>(f));
-// }
+template<class F>
+inline void EventLoop::submit(F&& f) {
+    if (threadPoolSize_) {
+        static ThreadPool pool_(threadPoolSize_);
+        pool_.enqueue(std::forward<F>(f));
+    } else {
+        f();
+    }
+}

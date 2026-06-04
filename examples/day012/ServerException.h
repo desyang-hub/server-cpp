@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-class ServerException : std::exception
+class ServerException : public std::exception
 {
 private:
     std::string msg_;

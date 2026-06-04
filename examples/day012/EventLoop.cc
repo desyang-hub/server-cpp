@@ -1,10 +1,10 @@
 #include "EventLoop.h"
 
-#include <iostream>
-
 #include "Channel.h"
 
-EventLoop::EventLoop() : epoll_(), isStop_(false) {
+/// @brief 
+/// @param threadPoolSize: 默认值`0`表示不启用线程池
+EventLoop::EventLoop(size_t threadPoolSize) : epoll_(), isStop_(false), threadPoolSize_(threadPoolSize) {
 }
 
 int EventLoop::epfd() const {

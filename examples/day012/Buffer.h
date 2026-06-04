@@ -44,6 +44,12 @@ public:
 
     void append(const char* buf, size_t len);
 
+    char* begin();
+
+    ssize_t readFd(int fd);
+
+    char* readerPos();
+
     size_t readableBytes() const;
 
     size_t writableBytes() const;

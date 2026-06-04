@@ -47,9 +47,15 @@ void Epoll::listen_fd(int fd, int ev_option) {
 
 std::vector<Channel*> Epoll::poll(int timeous) {
     int nfds = epoll_wait(epfd_, events_.data(), events_.size(), timeous);
-    errif(nfds == -1, "epoll wait error");
-
     std::vector<Channel*> events;
+    if (nfds == -1) {
+        if (errno == EINTR) {
+            return events;
+        }
+        
+        errif(true, "epoll wait error");
+    }
+    
     events.reserve(nfds);
 
     Channel* ch{};
