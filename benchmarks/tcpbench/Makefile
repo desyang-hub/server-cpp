@@ -1,4 +1,4 @@
-tcpbench: clean
+tcpbench:
 	g++ -o tcpbench tcpbench.cc Socket.cc Buffer.cc
 	
 clean:
