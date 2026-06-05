@@ -56,12 +56,29 @@ target_link_libraries(${APPS_SERVER}
     ${TCPSERVER_COMMON}
 )
 
-# 发布模式设置优化
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    # 或多配置生成器（如 Visual Studio）
-    target_compile_options(${APPS_SERVER} PRIVATE $<$<CONFIG:Release>:-O3>)
-    target_compile_options(${TCPSERVER_COMMON} PRIVATE $<$<CONFIG:Release>:-O3>)
-    target_compile_options(${TCPSERVER_BASE} PRIVATE $<$<CONFIG:Release>:-O3>)
-    target_compile_options(${TCPSERVER_NET} PRIVATE $<$<CONFIG:Release>:-O3>)
-    target_compile_options(${TCPSERVER_CORE} PRIVATE $<$<CONFIG:Release>:-O3>)    
-endif()
+# 定义一个函数，方便统一设置 sanitizer
+function(enable_asan TARGET_NAME)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(${TARGET_NAME} PRIVATE 
+            $<$<CONFIG:Debug>:-fsanitize=address -fno-omit-frame-pointer -O1>
+        )
+        target_link_options(${TARGET_NAME} PRIVATE 
+            $<$<CONFIG:Debug>:-fsanitize=address>
+        )
+    endif()
+endfunction()
+
+# Release 优化（适用于所有生成器）
+target_compile_options(${APPS_SERVER} PRIVATE $<$<CONFIG:Release>:-O3>)
+target_compile_options(${TCPSERVER_COMMON} PRIVATE $<$<CONFIG:Release>:-O3>)
+target_compile_options(${TCPSERVER_BASE} PRIVATE $<$<CONFIG:Release>:-O3>)
+target_compile_options(${TCPSERVER_NET} PRIVATE $<$<CONFIG:Release>:-O3>)
+target_compile_options(${TCPSERVER_CORE} PRIVATE $<$<CONFIG:Release>:-O3>)
+
+# Debug 调试选项（适用于所有生成器）
+# 为所有库和可执行文件启用 ASan
+enable_asan(${TCPSERVER_NET})
+enable_asan(${TCPSERVER_CORE})
+enable_asan(${TCPSERVER_BASE})
+enable_asan(${TCPSERVER_COMMON})
+enable_asan(${APPS_SERVER})   # ←←← 关键！可执行文件也要加
