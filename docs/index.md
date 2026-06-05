@@ -219,7 +219,7 @@ server-cpp/
 | 工作流 | 触发条件 | 说明 |
 |--------|----------|------|
 | **Build** | push main/develop, PR | 矩阵测试 Debug/Release × Static/Dynamic |
-| **Release** | push v*.*.* tag | 自动构建并发布 TGZ 到 GitHub Releases |
+| **Release** | push `v*.*.*` tag | 自动构建并发布 TGZ 到 GitHub Releases |
 
 </div>
 
