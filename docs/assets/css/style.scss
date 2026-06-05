@@ -1,0 +1,33 @@
+---
+---
+
+@import "jekyll-theme-cayman";
+
+/* 自定义样式 */
+.badges img {
+  margin-right: 4px;
+}
+
+.architecture pre {
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.components {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.components h3 {
+  margin-top: 0;
+}
+
+.ci table {
+  width: 100%;
+}
