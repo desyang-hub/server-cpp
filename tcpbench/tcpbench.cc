@@ -1,10 +1,11 @@
+
 #include <iostream>
 #include <unistd.h>
 #include <cstring>
 #include <functional>
 #include <atomic>
 #include <chrono>
-#include "utils.h"
+// #include "utils.h"
 #include "InetAddress.h"
 #include "Socket.h"
 #include "ThreadPool.h"
@@ -24,9 +25,17 @@ void oneClient(int msgs, int wait) {
     InetAddress addr = InetAddress(8080, "127.0.0.1");
     
     // 连接失败直接计入错误并返回，避免 errif 中断整个压测进程
-    sock.connect(addr);
-    g_fail_count.fetch_add(msgs, memory_order_relaxed);
-
+    try
+    {
+        sock.connect(addr);
+    }
+    catch(const std::exception& e)
+    {
+        // std::cerr << e.what() << '\n';
+        g_fail_count.fetch_add(msgs, memory_order_relaxed);
+        return;
+    }
+    
     if (wait > 0) sleep(wait);
 
     char buf[1024];

@@ -1,3 +1,13 @@
+/**
+ * @FilePath     : /server-cpp/test/InetAddress.h
+ * @Description  : 
+ * @Author       : desyang desyang@qq.com
+ * @Date         : 2026-06-05 14:42:00
+ * @LastEditors  : desyang desyang@qq.com
+ * @LastEditTime : 2026-06-05 14:42:01
+ * @
+ * @Copyright (c) 2026 by desyang, All Rights Reserved. 
+**/
 #pragma once
 
 #include <arpa/inet.h>
@@ -11,7 +21,7 @@ public:
     InetAddress() : addr_{}, sock_len_(sizeof(addr_)) {}
     ~InetAddress() = default;
 
-    InetAddress(int port, const char* ip = "127.0.0.1") : sock_len_(sizeof(addr_)) {
+    explicit InetAddress(int port, const char* ip = "127.0.0.1") : sock_len_(sizeof(addr_)) {
         addr_.sin_family = AF_INET;
         addr_.sin_addr.s_addr = inet_addr(ip);
         addr_.sin_port = htons(port);

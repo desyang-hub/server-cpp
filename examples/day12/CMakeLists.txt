@@ -27,17 +27,3 @@ target_compile_options(server_d12
 add_executable(client_d12
     client.cc
 )
-
-add_executable(ThreadPoolTest_d12
-    ThreadPoolTest.cc
-)
-
-add_executable(test_d12
-    test.cc
-)
-
-target_compile_options(test_d12
-    PRIVATE
-    $<$<CONFIG:Release>:-O3>
-    $<$<CONFIG:RelWithDebInfo>:-O2>
-)

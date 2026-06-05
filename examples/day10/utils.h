@@ -1,3 +1,13 @@
+/**
+ * @FilePath     : /server-cpp/examples/day10/utils.h
+ * @Description  : 
+ * @Author       : desyang desyang@qq.com
+ * @Date         : 2026-06-05 15:03:51
+ * @LastEditors  : desyang desyang@qq.com
+ * @LastEditTime : 2026-06-05 15:03:53
+ * @
+ * @Copyright (c) 2026 by desyang, All Rights Reserved. 
+**/
 #pragma once
 
 #include <unistd.h>

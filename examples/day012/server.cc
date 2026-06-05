@@ -42,6 +42,11 @@ int main(int argc, char const *argv[])
             return;
         }
 
+        if (num_send <= 0) {
+            conn->close();
+            return;
+        }
+
         buf->retrieve(num_send);
     };
 
