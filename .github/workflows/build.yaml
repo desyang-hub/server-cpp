@@ -1,0 +1,39 @@
+# .github/workflows/build.yml
+name: Build (Linux)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        build_type: [ Debug, Release ]
+        shared: [ ON, OFF ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+              -DBUILD_SHARED_LIBS=${{ matrix.shared }} \
+              -DWITH_EXAMPLES=ON
+
+    - name: Build
+      run: cmake --build build -j 2
+
+    - name: Verify libraries exist
+      run: |
+        ls -l build/lib/
+        ls -l build/bin/
