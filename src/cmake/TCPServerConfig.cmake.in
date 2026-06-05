@@ -1,0 +1,5 @@
+# cmake/TCPServerConfig.cmake
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/TCPServerTargets.cmake")
+check_required_components(TCPServer)
