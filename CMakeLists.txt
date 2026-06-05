@@ -12,4 +12,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(src)
-add_subdirectory(examples)
+
+# 在顶层 CMakeLists.txt 中
+option(WITH_EXAMPLES "Build examples" OFF)
+
+# cmake -DWITH_EXAMPLES=ON .. 开启examples构建
+if(WITH_EXAMPLES)
+    add_subdirectory(examples)
+endif()
