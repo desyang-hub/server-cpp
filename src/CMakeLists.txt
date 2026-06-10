@@ -176,6 +176,7 @@ install(FILES
     DESTINATION lib/cmake/TCPServer
 )
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/TCPServerVersion.make)
 
 
 # --- 安装 CMake 配置文件 ---

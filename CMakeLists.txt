@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(servercpp LANGUAGES C CXX)
+project(servercpp LANGUAGES C CXX VERSION 1.0.0)
 
 # 设置可执行文件输出目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
